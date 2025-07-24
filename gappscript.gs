@@ -26,11 +26,7 @@ function onEdit(e) {
     const statusCell = sheet.getRange(editedRow, STATUS_COL);
     const triggerCell = range; // The cell that was just edited to "Yes"
 
-    let driveLink = linkCell.getValue();
-    const richText = linkCell.getRichTextValue();
-    if (richText && richText.getLinkUrl()) {
-      driveLink = richText.getLinkUrl();
-    }
+    const driveLink = getLinkUrl(linkCell);
     const newName = newNameCell.getValue();
 
     // 2. Make sure the link and new name cells are not empty.
@@ -85,6 +81,30 @@ function extractFileIdFromLink(url) {
     id = match[0];
   }
   return id;
+}
+
+/**
+ * Returns the first hyperlink found in a cell's rich text content.
+ * Falls back to the plain cell value if no link is present.
+ * @param {GoogleAppsScript.Spreadsheet.Range} cell The cell to inspect.
+ * @returns {string} The URL or an empty string if none found.
+ */
+function getLinkUrl(cell) {
+  const rich = cell.getRichTextValue();
+  if (rich) {
+    const runs = rich.getRuns();
+    for (let i = 0; i < runs.length; i++) {
+      const url = runs[i].getLinkUrl();
+      if (url) {
+        return url;
+      }
+    }
+    if (rich.getLinkUrl()) {
+      return rich.getLinkUrl();
+    }
+  }
+  const plain = cell.getValue();
+  return typeof plain === 'string' ? plain : '';
 }
 
 /**
