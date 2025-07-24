@@ -26,7 +26,11 @@ function onEdit(e) {
     const statusCell = sheet.getRange(editedRow, STATUS_COL);
     const triggerCell = range; // The cell that was just edited to "Yes"
 
-    const driveLink = linkCell.getValue();
+    let driveLink = linkCell.getValue();
+    const richText = linkCell.getRichTextValue();
+    if (richText && richText.getLinkUrl()) {
+      driveLink = richText.getLinkUrl();
+    }
     const newName = newNameCell.getValue();
 
     // 2. Make sure the link and new name cells are not empty.
@@ -100,6 +104,7 @@ function onOpen(e) {
   SpreadsheetApp.getUi()
     .createMenu('Rename Tools')
     .addItem('Install Rename Trigger', 'setupTrigger')
+    .addToUi();
 
   const ss = SpreadsheetApp.getActive();
   const triggers = ScriptApp.getProjectTriggers();
@@ -113,15 +118,4 @@ function onOpen(e) {
       .onEdit()
       .create();
   }
-}
-
-/**
- * Adds a custom menu so the user can install the required trigger.
- */
-function onOpen(e) {
-  SpreadsheetApp.getUi()
-    .createMenu('Rename')
-    .addItem('Install onEdit trigger', 'setupTrigger')
-
-    .addToUi();
 }
