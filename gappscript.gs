@@ -88,6 +88,7 @@ function extractFileIdFromLink(url) {
  * to access Drive and rename files. Run this once manually.
  */
 function setupTrigger() {
+
   ScriptApp.newTrigger('onEdit')
     .forSpreadsheet(SpreadsheetApp.getActive())
     .onEdit()
@@ -99,5 +100,28 @@ function onOpen(e) {
   SpreadsheetApp.getUi()
     .createMenu('Rename Tools')
     .addItem('Install Rename Trigger', 'setupTrigger')
+
+  const ss = SpreadsheetApp.getActive();
+  const triggers = ScriptApp.getProjectTriggers();
+  const alreadyInstalled = triggers.some(t =>
+    t.getHandlerFunction() === 'onEdit' &&
+    t.getTriggerSourceId() === ss.getId()
+  );
+  if (!alreadyInstalled) {
+    ScriptApp.newTrigger('onEdit')
+      .forSpreadsheet(ss)
+      .onEdit()
+      .create();
+  }
+}
+
+/**
+ * Adds a custom menu so the user can install the required trigger.
+ */
+function onOpen(e) {
+  SpreadsheetApp.getUi()
+    .createMenu('Rename')
+    .addItem('Install onEdit trigger', 'setupTrigger')
+
     .addToUi();
 }
