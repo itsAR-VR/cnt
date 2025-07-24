@@ -82,3 +82,22 @@ function extractFileIdFromLink(url) {
   }
   return id;
 }
+
+/**
+ * Creates an installable onEdit trigger so the script has permission
+ * to access Drive and rename files. Run this once manually.
+ */
+function setupTrigger() {
+  ScriptApp.newTrigger('onEdit')
+    .forSpreadsheet(SpreadsheetApp.getActive())
+    .onEdit()
+    .create();
+}
+
+// Add a custom menu so the user can easily install the trigger
+function onOpen(e) {
+  SpreadsheetApp.getUi()
+    .createMenu('Rename Tools')
+    .addItem('Install Rename Trigger', 'setupTrigger')
+    .addToUi();
+}
